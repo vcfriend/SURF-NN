@@ -1,10 +1,18 @@
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <opencv2\opencv.hpp>
 #include <opencv2\nonfree.hpp>
 
 using namespace std;
 using namespace cv;
+
+void progress(int i, int size)
+{
+        if (i != 0) cout << "\b\b\b";
+        cout << setw(2) << i * 100 / size << "%";
+        if (i == size) cout << endl;
+}
 
 int main()
 {
@@ -26,13 +34,14 @@ int main()
     Ptr<DescriptorExtractor> extractor(new SiftDescriptorExtractor);
     BOWKMeansTrainer bowtrainer(100);
 
-    cout << "Extracting descriptors..." << endl;
+    cout << "Extracting descriptors...";
     for (int i = 0; i < filepaths.size(); i++)
     {
         img = imread(filepaths[i], 0);
         detector->detect(img, keypoints);
         extractor->compute(img, keypoints, descriptors);
         all_descriptors.push_back(descriptors);
+        progress(i, filepaths.size() - 1);
     }
 
     cout << "Building vocabulary..." << endl;
@@ -45,13 +54,14 @@ int main()
     BOWImgDescriptorExtractor bowextractor(extractor, matcher);
     bowextractor.setVocabulary(vocabulary);
 
-    cout << "Building training set..." << endl;
+    cout << "Building training set...";
     for (int i = 0; i < filepaths.size(); i++)
     {
         img = imread(filepaths[i], 0);
         detector->detect(img, keypoints);
         bowextractor.compute(img, keypoints, hist);
         training_set.push_back(hist);
+        progress(i, filepaths.size() - 1);
     }
 
     return 0;
