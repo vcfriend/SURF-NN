@@ -7,7 +7,7 @@
 using namespace std;
 using namespace cv;
 
-void progress(int i, int size)
+void progress(int i, size_t size)
 {
         if (i != 0) cout << "\b\b\b";
         cout << setw(2) << i * 100 / size << "%";
@@ -63,6 +63,10 @@ int main()
         training_set.push_back(hist);
         progress(i, filepaths.size() - 1);
     }
+
+    FileStorage fs("training_set.yml", FileStorage::WRITE);
+    fs << "training_set" << training_set;
+    fs.release();
 
     return 0;
 }
