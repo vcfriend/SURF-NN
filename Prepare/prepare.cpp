@@ -14,16 +14,23 @@ void progress(int i, size_t size)
         if (i == size) cout << endl;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
-    /* get filepaths vector */
-    string filedir = "C:/Users/Meng/Downloads/ORL faces/";
-    fstream filelist(filedir + "list");
-    vector<string> filepaths;
-    string filename;
+    if (argc != 3)
+    {
+        cout << "Usage: Prepare image_list samples_file" << endl;
+        return -1;
+    }
 
-    while (getline(filelist, filename))
-        filepaths.push_back(filedir + filename);
+    string samples_file(argv[2]);
+
+    /* get filepaths vector */
+    fstream filelist(argv[1]);
+    vector<string> filepaths;
+    string filepath;
+
+    while (getline(filelist, filepath))
+        filepaths.push_back(filepath);
 
     /* build BOW vocabulary */
     Mat img;
@@ -32,7 +39,7 @@ int main()
     Mat all_descriptors;
     Ptr<FeatureDetector> detector(new SurfFeatureDetector(100));
     Ptr<DescriptorExtractor> extractor(new SiftDescriptorExtractor);
-    BOWKMeansTrainer bowtrainer(100);
+    BOWKMeansTrainer bowtrainer(50);
 
     cout << "Extracting descriptors...";
     for (int i = 0; i < filepaths.size(); i++)
@@ -49,7 +56,7 @@ int main()
 
     /* build training set */
     Mat hist;
-    Mat training_set;
+    Mat samples;
     Ptr<DescriptorMatcher> matcher(new FlannBasedMatcher);
     BOWImgDescriptorExtractor bowextractor(extractor, matcher);
     bowextractor.setVocabulary(vocabulary);
@@ -60,13 +67,15 @@ int main()
         img = imread(filepaths[i], 0);
         detector->detect(img, keypoints);
         bowextractor.compute(img, keypoints, hist);
-        training_set.push_back(hist);
+        samples.push_back(hist);
         progress(i, filepaths.size() - 1);
     }
 
-    FileStorage fs("training_set.yml", FileStorage::WRITE);
-    fs << "training_set" << training_set;
+    cout << "Writing to " << samples_file << ".yml..." << endl;
+    FileStorage fs(samples_file + ".yml", FileStorage::WRITE);
+    fs << samples_file << samples;
     fs.release();
+    cout << "Done." << endl;
 
     return 0;
 }
