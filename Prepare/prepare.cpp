@@ -32,31 +32,50 @@ int main(int argc, char *argv[])
     while (getline(filelist, filepath))
         filepaths.push_back(filepath);
 
-    /* build BOW vocabulary */
+    /* get BOW vocabulary */
     Mat img;
     vector<KeyPoint> keypoints;
     Mat descriptors;
     Mat all_descriptors;
     Ptr<FeatureDetector> detector(new SurfFeatureDetector(100));
     Ptr<DescriptorExtractor> extractor(new SiftDescriptorExtractor);
-    BOWKMeansTrainer bowtrainer(50);
+    Mat vocabulary;
+    FileStorage fs;
 
-    cout << "Extracting descriptors...";
-    for (int i = 0; i < filepaths.size(); i++)
+    if (fs.open("vocabulary.yml", FileStorage::READ))
     {
-        img = imread(filepaths[i], 0);
-        detector->detect(img, keypoints);
-        extractor->compute(img, keypoints, descriptors);
-        all_descriptors.push_back(descriptors);
-        progress(i, filepaths.size() - 1);
+        cout << "Reading vocabulary from file..." << endl;
+        fs["vocabulary"] >> vocabulary;
+        fs.release();
+    }
+    else
+    {
+        cout << "Vocabulary file not found." << endl;
+        cout << "Building vocabulary..." << endl;
+        BOWKMeansTrainer bowtrainer(50);
+
+        cout << "Extracting descriptors...";
+        for (int i = 0; i < filepaths.size(); i++)
+        {
+            img = imread(filepaths[i], 0);
+            detector->detect(img, keypoints);
+            extractor->compute(img, keypoints, descriptors);
+            all_descriptors.push_back(descriptors);
+            progress(i, filepaths.size() - 1);
+        }
+
+        cout << "Clustering descriptors..." << endl;
+        vocabulary = bowtrainer.cluster(all_descriptors);
+
+        cout << "Writing to vocabulary.yml..." << endl;
+        fs.open("vocabulary.yml", FileStorage::WRITE);
+        fs << "vocabulary" << vocabulary;
+
+        fs.release();
+        all_descriptors.release();
     }
 
-    cout << "Building vocabulary..." << endl;
-    Mat vocabulary = bowtrainer.cluster(all_descriptors);
-
     /* build training set */
-    Mat hist;
-    Mat samples;
     Ptr<DescriptorMatcher> matcher(new FlannBasedMatcher);
     BOWImgDescriptorExtractor bowextractor(extractor, matcher);
     bowextractor.setVocabulary(vocabulary);
@@ -66,15 +85,16 @@ int main(int argc, char *argv[])
     {
         img = imread(filepaths[i], 0);
         detector->detect(img, keypoints);
-        bowextractor.compute(img, keypoints, hist);
-        samples.push_back(hist);
+        bowextractor.compute(img, keypoints, descriptors);
+        all_descriptors.push_back(descriptors);
         progress(i, filepaths.size() - 1);
     }
 
     cout << "Writing to " << samples_file << ".yml..." << endl;
-    FileStorage fs(samples_file + ".yml", FileStorage::WRITE);
-    fs << samples_file << samples;
+    fs.open(samples_file + ".yml", FileStorage::WRITE);
+    fs << samples_file << all_descriptors;
     fs.release();
+
     cout << "Done." << endl;
 
     return 0;
