@@ -25,10 +25,15 @@ int main(int argc, char *argv[])
     string samples_file(argv[2]);
 
     /* get filepaths vector */
-    fstream filelist(argv[1]);
+    ifstream filelist;
     vector<string> filepaths;
     string filepath;
 
+    filelist.open(argv[1]);
+    if (!filelist) {
+        cout << "Can't read image_list!" << endl;
+        return -1;
+    }
     while (getline(filelist, filepath))
         filepaths.push_back(filepath);
 
@@ -58,6 +63,10 @@ int main(int argc, char *argv[])
         for (int i = 0; i < filepaths.size(); i++)
         {
             img = imread(filepaths[i], 0);
+            if (img.empty()) {
+                cout << "Can't read " << filepaths[i] << "in file list!" << endl;
+                return -1;
+            }
             detector->detect(img, keypoints);
             extractor->compute(img, keypoints, descriptors);
             all_descriptors.push_back(descriptors);
