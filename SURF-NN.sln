@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Train", "Train\Train.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Detect", "Detect\Detect.vcxproj", "{E12383CA-A5CC-442C-A937-C3A190BB8452}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Evaluate", "Evaluate\Evaluate.vcxproj", "{3760B6EC-7033-4E65-A497-AA16FC573C56}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -49,6 +51,16 @@ Global
 		{E12383CA-A5CC-442C-A937-C3A190BB8452}.Release|Win32.ActiveCfg = Release|x64
 		{E12383CA-A5CC-442C-A937-C3A190BB8452}.Release|x64.ActiveCfg = Release|x64
 		{E12383CA-A5CC-442C-A937-C3A190BB8452}.Release|x64.Build.0 = Release|x64
+		{3760B6EC-7033-4E65-A497-AA16FC573C56}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{3760B6EC-7033-4E65-A497-AA16FC573C56}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{3760B6EC-7033-4E65-A497-AA16FC573C56}.Debug|Win32.ActiveCfg = Debug|x64
+		{3760B6EC-7033-4E65-A497-AA16FC573C56}.Debug|x64.ActiveCfg = Debug|x64
+		{3760B6EC-7033-4E65-A497-AA16FC573C56}.Debug|x64.Build.0 = Debug|x64
+		{3760B6EC-7033-4E65-A497-AA16FC573C56}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{3760B6EC-7033-4E65-A497-AA16FC573C56}.Release|Mixed Platforms.Build.0 = Release|x64
+		{3760B6EC-7033-4E65-A497-AA16FC573C56}.Release|Win32.ActiveCfg = Release|x64
+		{3760B6EC-7033-4E65-A497-AA16FC573C56}.Release|x64.ActiveCfg = Release|x64
+		{3760B6EC-7033-4E65-A497-AA16FC573C56}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
