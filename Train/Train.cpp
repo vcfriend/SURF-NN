@@ -26,13 +26,13 @@ int main(int argc, char *argv[])
     fs.open(samples_file, FileStorage::READ);
     fs[samples_file.substr(0, samples_file.rfind('.'))] >> samples;
     inputs.push_back(samples);
-    hconcat(Mat::ones(samples.rows, 1, CV_32F), Mat::zeros(samples.rows, 1, CV_32F), pos_labels);
+    hconcat(Mat::ones(samples.rows, 1, CV_32F), Mat(samples.rows, 1, CV_32F, Scalar(-1)), pos_labels);
 
     samples_file = argv[2]; // read negative samples
     fs.open(samples_file, FileStorage::READ);
     fs[samples_file.substr(0, samples_file.rfind('.'))] >> samples;
     inputs.push_back(samples);
-    hconcat(Mat::ones(samples.rows, 1, CV_32F), Mat::zeros(samples.rows, 1, CV_32F), neg_labels);
+    hconcat(Mat(samples.rows, 1, CV_32F, Scalar(-1)), Mat::ones(samples.rows, 1, CV_32F), neg_labels);
 
     vconcat(pos_labels, neg_labels, labels);
 
