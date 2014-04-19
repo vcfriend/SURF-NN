@@ -18,30 +18,24 @@ int main(int argc, char *argv[])
     FileStorage fs;
     Mat samples;
     Mat inputs;
-    Mat pos_labels;
-    Mat neg_labels;
     Mat labels;
 
     samples_file = argv[1]; // read positive samples
     fs.open(samples_file, FileStorage::READ);
     fs[samples_file.substr(0, samples_file.rfind('.'))] >> samples;
     inputs.push_back(samples);
-    hconcat(Mat::ones(samples.rows, 1, CV_32F), Mat(samples.rows, 1, CV_32F, Scalar(-1)), pos_labels);
+    labels.push_back(Mat(Mat::ones(samples.rows, 1, CV_32F)));
 
     samples_file = argv[2]; // read negative samples
     fs.open(samples_file, FileStorage::READ);
     fs[samples_file.substr(0, samples_file.rfind('.'))] >> samples;
     inputs.push_back(samples);
-    hconcat(Mat(samples.rows, 1, CV_32F, Scalar(-1)), Mat::ones(samples.rows, 1, CV_32F), neg_labels);
-
-    vconcat(pos_labels, neg_labels, labels);
+    labels.push_back(Mat(samples.rows, 1, CV_32F, Scalar(-1)));
 
     samples.release();
-    pos_labels.release();
-    neg_labels.release();
     fs.release();
 
-    /* Neural network */
+    /* Neural Network */
     cout << "Constructing neural network..." << endl;
     CvANN_MLP_TrainParams params;
     params.term_crit = cvTermCriteria(CV_TERMCRIT_ITER + CV_TERMCRIT_EPS, 1000, 0.01);
@@ -49,7 +43,7 @@ int main(int argc, char *argv[])
     params.bp_dw_scale = 0.1;
     params.bp_moment_scale = 0.1;
 
-    Mat layerSizes = (Mat_<int>(1, 3) << 50, 40, 2);
+    Mat layerSizes = (Mat_<int>(1, 3) << 50, 40, 1);
     CvANN_MLP nn(layerSizes, CvANN_MLP::SIGMOID_SYM, 1, 1); // activation function: alpha=1, beta=1
 
     cout << "Training neural network..." << endl;
