@@ -1,17 +1,16 @@
 #include <iostream>
 #include <opencv2\opencv.hpp>
-#include <opencv2\nonfree.hpp>
 
 using namespace std;
 using namespace cv;
 
 int main(int argc, char *argv[])
 {
-    //if (argc != 2)
-    //{
-    //    cout << "Usage: Detect image_file" << endl;
-    //    return -1;
-    //}
+    if (argc != 3)
+    {
+        cout << "Usage: Evaluate pos.yml neg.yml" << endl;
+        return -1;
+    }
 
     cout << "Reading trained neural network..." << endl;
     CvANN_MLP nn;
@@ -27,13 +26,13 @@ int main(int argc, char *argv[])
     Mat neg_labels;
     Mat labels;
 
-    samples_file = "pos.yml"; // read positive samples
+    samples_file = argv[1]; // read positive samples
     fs.open(samples_file, FileStorage::READ);
     fs[samples_file.substr(0, samples_file.rfind('.'))] >> samples;
     inputs.push_back(samples);
     hconcat(Mat::ones(samples.rows, 1, CV_32F), Mat::zeros(samples.rows, 1, CV_32F), pos_labels);
 
-    samples_file = "neg.yml"; // read negative samples
+    samples_file = argv[2]; // read negative samples
     fs.open(samples_file, FileStorage::READ);
     fs[samples_file.substr(0, samples_file.rfind('.'))] >> samples;
     inputs.push_back(samples);
