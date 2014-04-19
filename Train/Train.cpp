@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 {
     if (argc != 3)
     {
-        cout << "Usage: Train pos_samples.yml neg_samples.yml" << endl;
+        cout << "Usage: Train pos.yml neg.yml" << endl;
         return -1;
     }
 
