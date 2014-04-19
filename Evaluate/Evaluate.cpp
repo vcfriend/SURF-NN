@@ -19,12 +19,14 @@ int main(int argc, char *argv[])
     Mat samples;
     Mat inputs;
     Mat labels;
+    int pos_num;
 
     samples_file = argv[1]; // read positive samples
     fs.open(samples_file, FileStorage::READ);
     fs[samples_file.substr(0, samples_file.rfind('.'))] >> samples;
     inputs.push_back(samples);
     labels.push_back(Mat(Mat::ones(samples.rows, 1, CV_32F)));
+    pos_num = samples.rows;
 
     samples_file = argv[2]; // read negative samples
     fs.open(samples_file, FileStorage::READ);
@@ -48,7 +50,11 @@ int main(int argc, char *argv[])
 
     Mat diff;
     compare(labels, preds, diff, CMP_NE);
-    int nz = countNonZero(diff);
+    cout << "ACC = " << (float)(diff.rows - countNonZero(diff)) / diff.rows << endl;
+    compare(labels.rowRange(0, pos_num), preds.rowRange(0, pos_num), diff, CMP_NE);
+    cout << "TPR = " << (float)(diff.rows - countNonZero(diff)) / diff.rows << endl;
+    compare(labels.rowRange(pos_num, labels.rows), preds.rowRange(pos_num, preds.rows), diff, CMP_NE);
+    cout << "FPR = " << (float)countNonZero(diff) / diff.rows << endl;
 
     return 0;
 }
