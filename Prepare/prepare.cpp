@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     Mat descriptors;
     Mat all_descriptors;
     Ptr<FeatureDetector> detector(new SurfFeatureDetector(400));
-    Ptr<DescriptorExtractor> extractor(new SiftDescriptorExtractor);
+    Ptr<DescriptorExtractor> extractor(new SurfDescriptorExtractor);
     Mat vocabulary;
     FileStorage fs;
 
