@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     vector<KeyPoint> keypoints;
     Mat descriptors;
     Mat all_descriptors;
-    Ptr<FeatureDetector> detector(new SurfFeatureDetector(100));
+    Ptr<FeatureDetector> detector(new SurfFeatureDetector(400));
     Ptr<DescriptorExtractor> extractor(new SiftDescriptorExtractor);
     Mat vocabulary;
     FileStorage fs;
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     {
         cout << "Vocabulary file not found." << endl;
         cout << "Building vocabulary..." << endl;
-        BOWKMeansTrainer bowtrainer(50);
+        BOWKMeansTrainer bowtrainer(10);
 
         cout << "Extracting descriptors...";
         for (int i = 0; i < filepaths.size(); i++)

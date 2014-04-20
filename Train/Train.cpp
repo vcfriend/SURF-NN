@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     params.bp_dw_scale = 0.1;
     params.bp_moment_scale = 0.1;
 
-    Mat layerSizes = (Mat_<int>(1, 3) << 50, 40, 1);
+    Mat layerSizes = (Mat_<int>(1, 3) << 10, 10, 1);
     CvANN_MLP nn(layerSizes, CvANN_MLP::SIGMOID_SYM, 1, 1); // activation function: alpha=1, beta=1
 
     cout << "Training neural network..." << endl;
