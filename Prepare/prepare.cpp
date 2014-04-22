@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     {
         cout << "Vocabulary file not found." << endl;
         cout << "Building vocabulary..." << endl;
-        BOWKMeansTrainer bowtrainer(10);
+        BOWKMeansTrainer bowtrainer(100);
 
         cout << "Extracting descriptors...";
         for (int i = 0; i < filepaths.size(); i++)
