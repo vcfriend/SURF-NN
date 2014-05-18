@@ -2,6 +2,8 @@
 #include <opencv2\opencv.hpp>
 #include <opencv2\nonfree.hpp>
 
+#define SURF_HESSIAN_THRESHOLD 400
+
 using namespace std;
 using namespace cv;
 
@@ -43,7 +45,7 @@ int main(int argc, char *argv[])
     cout << "Computing image descriptors..." << endl;
     vector<KeyPoint> keypoints;
     Mat descriptors;
-    Ptr<FeatureDetector> detector(new SurfFeatureDetector(400));
+    Ptr<FeatureDetector> detector(new SurfFeatureDetector(SURF_HESSIAN_THRESHOLD));
     Ptr<DescriptorExtractor> extractor(new SurfDescriptorExtractor);
     detector->detect(img, keypoints);
     extractor->compute(img, keypoints, descriptors);

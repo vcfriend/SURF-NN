@@ -4,6 +4,9 @@
 #include <opencv2\opencv.hpp>
 #include <opencv2\nonfree.hpp>
 
+#define SURF_HESSIAN_THRESHOLD 400
+#define BOW_CLUSTER_COUNT 100
+
 using namespace std;
 using namespace cv;
 
@@ -42,7 +45,7 @@ int main(int argc, char *argv[])
     vector<KeyPoint> keypoints;
     Mat descriptors;
     Mat all_descriptors;
-    Ptr<FeatureDetector> detector(new SurfFeatureDetector(400));
+    Ptr<FeatureDetector> detector(new SurfFeatureDetector(SURF_HESSIAN_THRESHOLD));
     Ptr<DescriptorExtractor> extractor(new SurfDescriptorExtractor);
     Mat vocabulary;
     FileStorage fs;
@@ -57,7 +60,7 @@ int main(int argc, char *argv[])
     {
         cout << "Vocabulary file not found." << endl;
         cout << "Building vocabulary..." << endl;
-        BOWKMeansTrainer bowtrainer(100);
+        BOWKMeansTrainer bowtrainer(BOW_CLUSTER_COUNT);
 
         cout << "Extracting descriptors...";
         for (int i = 0; i < filepaths.size(); i++)

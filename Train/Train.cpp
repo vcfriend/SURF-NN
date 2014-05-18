@@ -1,6 +1,8 @@
 #include <iostream>
 #include <opencv2\opencv.hpp>
 
+#define NN_HIDDEN_LAYER_SIZE 10
+
 using namespace std;
 using namespace cv;
 
@@ -43,7 +45,7 @@ int main(int argc, char *argv[])
     params.bp_dw_scale = 0.1;
     params.bp_moment_scale = 0.1;
 
-    Mat layerSizes = (Mat_<int>(1, 3) << inputs.cols, 10, 1);
+    Mat layerSizes = (Mat_<int>(1, 3) << inputs.cols, NN_HIDDEN_LAYER_SIZE, 1);
     CvANN_MLP nn(layerSizes, CvANN_MLP::SIGMOID_SYM, 1, 1); // activation function: alpha=1, beta=1
 
     cout << "Training neural network..." << endl;
