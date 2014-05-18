@@ -57,9 +57,6 @@ int main(int argc, char *argv[])
     Mat img_rgb(img.size(), CV_8UC3);
     cvtColor(img, img_rgb, cv::COLOR_GRAY2BGR);
 
-    namedWindow("Result", cv::WINDOW_AUTOSIZE);
-    imshow("Result", img_rgb);
-
     //for (int l = 80; l < img.cols && l < img.rows; l+=3) {
     int l = 120; {
         Rect win(0, 0, l, l);
@@ -87,16 +84,20 @@ int main(int argc, char *argv[])
                 if (!bowdescriptor.empty()) {
                     Mat resp;
                     nn.predict(bowdescriptor, resp);
-                    wins.push_back(win);
                     if (resp.at<float>(0, 0) > 0) {
-                        rectangle(img_rgb, win, cv::Scalar(255, 0, 0), 1);
-                        imshow("Result", img_rgb);
-                        waitKey(1);
+                        wins.push_back(win);
                     }
                 }
             }
         }
     }
+
+    cout << "Showing detection results..." << endl;
+    for (Rect win : wins)
+        rectangle(img_rgb, win, cv::Scalar(255, 0, 0), 1);
+
+    namedWindow("Result", cv::WINDOW_AUTOSIZE);
+    imshow("Result", img_rgb);
     waitKey(0);
 
     return 0;
