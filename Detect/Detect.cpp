@@ -95,6 +95,9 @@ int main(int argc, char *argv[])
     cout << "Showing detection results..." << endl;
     for (Rect win : wins)
         rectangle(img_rgb, win, cv::Scalar(255, 0, 0), 1);
+    groupRectangles(wins, 1, 0.2);
+    for (Rect win : wins)
+        rectangle(img_rgb, win, cv::Scalar(0, 255, 0), 2);
 
     namedWindow("Result", cv::WINDOW_AUTOSIZE);
     imshow("Result", img_rgb);
