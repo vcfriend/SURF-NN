@@ -83,12 +83,10 @@ int main(int argc, char *argv[])
                     dptr[matches[i].trainIdx] += 1.f;
                 bowdescriptor /= subdescriptors.rows;
 
-                if (!bowdescriptor.empty()) {
-                    Mat resp;
-                    nn.predict(bowdescriptor, resp);
-                    if (resp.at<float>(0, 0) > 0) {
-                        wins.push_back(win);
-                    }
+                Mat resp;
+                nn.predict(bowdescriptor, resp);
+                if (resp.at<float>(0, 0) > 0) {
+                    wins.push_back(win);
                 }
             }
         }
