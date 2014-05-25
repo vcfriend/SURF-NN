@@ -21,18 +21,24 @@ int main(int argc, char *argv[])
 {
     if (argc != 3)
     {
-        cout << "Usage: Prepare image_list samples_file" << endl;
+        cout << "Usage: Prepare [-p|-n] image_list" << endl;
         return -1;
     }
 
-    string samples_file(argv[2]);
+    int pos_flag;
+    if (strcmp(argv[1], "-n") == 0)
+        pos_flag = 0;
+    else if (strcmp(argv[1], "-p") == 0)
+        pos_flag = 1;
+    else
+        return -1;
 
     /* get filepaths vector */
     ifstream filelist;
     vector<string> filepaths;
     string filepath;
 
-    filelist.open(argv[1]);
+    filelist.open(argv[2]);
     if (!filelist) {
         cout << "Can't read image_list!" << endl;
         return -1;
@@ -50,15 +56,19 @@ int main(int argc, char *argv[])
     Mat vocabulary;
     FileStorage fs;
 
-    if (fs.open("vocabulary.yml", FileStorage::READ))
+    if (!pos_flag)
     {
-        cout << "Reading vocabulary from file..." << endl;
+        cout << "Build negative training set." << endl;
+        if (!fs.open("vocabulary.yml", FileStorage::READ)) {
+            cout << "Can't read vocabulary file." << endl;
+            return -1;
+        }
         fs["vocabulary"] >> vocabulary;
         fs.release();
     }
     else
     {
-        cout << "Vocabulary file not found." << endl;
+        cout << "Build positive training set." << endl;
         cout << "Building vocabulary..." << endl;
         BOWKMeansTrainer bowtrainer(BOW_CLUSTER_COUNT);
 
@@ -101,6 +111,12 @@ int main(int argc, char *argv[])
         all_descriptors.push_back(descriptors);
         progress(i, filepaths.size() - 1);
     }
+
+    string samples_file;
+    if (pos_flag)
+        samples_file = "pos";
+    else
+        samples_file = "neg";
 
     cout << "Writing to " << samples_file << ".yml..." << endl;
     fs.open(samples_file + ".yml", FileStorage::WRITE);
