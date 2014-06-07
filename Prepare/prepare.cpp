@@ -101,15 +101,65 @@ int main(int argc, char *argv[])
     Ptr<DescriptorMatcher> matcher(new FlannBasedMatcher);
     BOWImgDescriptorExtractor bowextractor(extractor, matcher);
     bowextractor.setVocabulary(vocabulary);
+    Mat bowdescriptor;
+    int cluster_count = vocabulary.rows;
 
     cout << "Building training set...";
-    for (int i = 0; i < filepaths.size(); i++)
-    {
-        img = imread(filepaths[i], 0);
-        detector->detect(img, keypoints);
-        bowextractor.compute(img, keypoints, descriptors);
-        all_descriptors.push_back(descriptors);
-        progress(i, filepaths.size() - 1);
+    if (pos_flag) {
+        for (int i = 0; i < filepaths.size(); i++)
+        {
+            img = imread(filepaths[i], 0);
+            detector->detect(img, keypoints);
+            bowextractor.compute(img, keypoints, bowdescriptor);
+            all_descriptors.push_back(bowdescriptor);
+            progress(i, filepaths.size() - 1);
+        }
+    }
+    else {
+        for (int i = 0; i < filepaths.size(); i++)
+        {
+            img = imread(filepaths[i], 0);
+            detector->detect(img, keypoints);
+            extractor->compute(img, keypoints, descriptors);
+
+            Mat keypoints_map(img.size(), CV_16UC1, Scalar::all(0));
+            for (int j = 0; j < keypoints.size(); j++)
+                keypoints_map.at<ushort>((int)keypoints[j].pt.y, (int)keypoints[j].pt.x) = j;
+
+            //for (int l = 80; l < img.cols && l < img.rows; l+=10) {
+            { int l = 80;
+                //cout << l << ' ' << '(' << img.rows << ',' << img.cols << ')' << endl;
+                Rect win(0, 0, l, l);
+                for (win.y = 0; win.y <= img.rows - win.height; win.y+=win.height) {
+                    for (win.x = 0; win.x <= img.cols - win.width; win.x+=win.width) {
+                        Mat subdescriptors;
+                        SparseMat subkeypoints_map(keypoints_map(win));
+                        for (SparseMatConstIterator it = subkeypoints_map.begin(); it != subkeypoints_map.end(); it++) {
+                            ushort index = it.value<ushort>();
+                            KeyPoint *kp = &keypoints[index];
+                            if (kp->pt.x - kp->size > win.x && kp->pt.x + kp->size < win.x + win.width
+                             && kp->pt.y - kp->size > win.y && kp->pt.y + kp->size < win.y + win.height)
+                                subdescriptors.push_back(descriptors.row(index));
+                        }
+
+                        if (subdescriptors.rows > 0) {
+                            vector<DMatch> matches;
+                            matcher->match(subdescriptors, matches);
+
+                            Mat bowdescriptor(1, cluster_count, CV_32FC1, Scalar::all(0.0));
+                            float *dptr = (float*)bowdescriptor.data;
+                            for (int k = 0; k < matches.size(); k++)
+                                dptr[matches[k].trainIdx] += 1.f;
+                            bowdescriptor /= subdescriptors.rows;
+
+                            all_descriptors.push_back(bowdescriptor);
+                        }
+                    }
+                }
+            }
+
+            progress(i, filepaths.size() - 1);
+        }
     }
 
     string samples_file;
