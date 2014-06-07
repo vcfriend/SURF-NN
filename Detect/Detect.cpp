@@ -74,19 +74,21 @@ int main(int argc, char *argv[])
                         subdescriptors.push_back(descriptors.row(index));
                 }
 
-                vector<DMatch> matches;
-                matcher->match(subdescriptors, matches);
+                if (subdescriptors.rows > 0) {
+                    vector<DMatch> matches;
+                    matcher->match(subdescriptors, matches);
 
-                Mat bowdescriptor(1, cluster_count, CV_32FC1, Scalar::all(0.0));
-                float *dptr = (float*)bowdescriptor.data;
-                for (int i = 0; i < matches.size(); i++)
-                    dptr[matches[i].trainIdx] += 1.f;
-                bowdescriptor /= subdescriptors.rows;
+                    Mat bowdescriptor(1, cluster_count, CV_32FC1, Scalar::all(0.0));
+                    float *dptr = (float*)bowdescriptor.data;
+                    for (int i = 0; i < matches.size(); i++)
+                        dptr[matches[i].trainIdx] += 1.f;
+                    bowdescriptor /= subdescriptors.rows;
 
-                Mat resp;
-                nn.predict(bowdescriptor, resp);
-                if (resp.at<float>(0, 0) > 0) {
-                    wins.push_back(win);
+                    Mat resp;
+                    nn.predict(bowdescriptor, resp);
+                    if (resp.at<float>(0, 0) > 0) {
+                        wins.push_back(win);
+                    }
                 }
             }
         }
